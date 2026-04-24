@@ -12,7 +12,7 @@
     ],
     "web_accessible_resources": [
         {
-            "resources": ["dictionary.json"],
+            "resources": ["dictionary/*"],
             "matches": ["<all_urls>"]
         }
     ]

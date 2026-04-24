@@ -2,9 +2,14 @@ let khmerMap = {};
 let pendingReplacement = null;
 let popup = null;
 
-fetch(chrome.runtime.getURL('dictionary.json'))
+fetch(chrome.runtime.getURL('dictionary/index.json'))
   .then(r => r.json())
-  .then(data => { khmerMap = data; })
+  .then(letters => Promise.all(
+    letters.map(l =>
+      fetch(chrome.runtime.getURL(`dictionary/${l}.json`)).then(r => r.json())
+    )
+  ))
+  .then(maps => { khmerMap = Object.assign({}, ...maps); })
   .catch(err => console.error('[Khmer Loeun] Failed to load dictionary:', err));
 
 // ---------------------------------------------------------------------------
