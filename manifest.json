@@ -1,0 +1,13 @@
+{
+    "manifest_version": 3,
+    "name": "ខ្មែរលឿន | Khmer Loeun",
+    "short_name": "KhmerLoeun",
+    "version": "1.0.0",
+    "description": "Convert Sing Khmer (Latin shorthand) to Khmer Unicode instantly.",
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["dictionary.js", "content.js"]
+        }
+    ]
+}
