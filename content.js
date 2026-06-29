@@ -13,6 +13,35 @@ fetch(chrome.runtime.getURL('dictionary/index.json'))
   .catch(err => console.error('[Khmer Loeun] Failed to load dictionary:', err));
 
 // ---------------------------------------------------------------------------
+// Fuzzy lookup — tries phonetic variants when exact match fails
+// ---------------------------------------------------------------------------
+
+function fuzzyLookup(word) {
+  if (khmerMap[word]) return khmerMap[word];
+
+  const tries = new Set();
+
+  // ch <-> j  (both used for ច/ជ sounds)
+  if (word.includes('ch')) tries.add(word.replace(/ch/g, 'j'));
+  if (word.startsWith('j')) tries.add('ch' + word.slice(1));
+  else if (word.includes('j')) tries.add(word.replace(/j/g, 'ch'));
+
+  // collapse doubled vowels: baan -> ban, heuy -> huy
+  const collapsed = word.replace(/([aeiou])\1+/g, '$1');
+  if (collapsed !== word) tries.add(collapsed);
+
+  // strip trailing h after vowel: nah -> na, nih -> ni
+  if (/[aeiou]h$/.test(word)) tries.add(word.slice(0, -1));
+
+  for (const candidate of tries) {
+    if (candidate && candidate !== word && khmerMap[candidate]) {
+      return khmerMap[candidate];
+    }
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
 // Popup UI
 // ---------------------------------------------------------------------------
 
@@ -202,9 +231,9 @@ function handleInputSpace(el) {
   const match = beforeCursor.match(/([a-zA-Z]+)\s$/);
   const lastWord = match?.[1]?.toLowerCase();
 
-  if (!lastWord || !khmerMap[lastWord]) return;
+  const khmerWord = lastWord ? fuzzyLookup(lastWord) : null;
+  if (!khmerWord) return;
 
-  const khmerWord = khmerMap[lastWord];
   const endOfWord = pos - 1;           // position of the space
   const startOfWord = endOfWord - lastWord.length;
 
@@ -235,9 +264,9 @@ function handleContentEditableSpace() {
   const match = beforeCursor.match(/([a-zA-Z]+)\s$/);
   const lastWord = match?.[1]?.toLowerCase();
 
-  if (!lastWord || !khmerMap[lastWord]) return;
+  const khmerWord = lastWord ? fuzzyLookup(lastWord) : null;
+  if (!khmerWord) return;
 
-  const khmerWord = khmerMap[lastWord];
   const startOfWord = range.startOffset - lastWord.length - 1;
   const endOfWord = range.startOffset - 1;
 
