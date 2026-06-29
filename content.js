@@ -265,7 +265,11 @@ function commitOption(index) {
 
   if (type === 'input') {
     const { element, startOfWord, endOfWord } = pendingReplacement;
-    element.setRangeText(word, startOfWord, endOfWord, 'end');
+    const before = element.value.slice(0, startOfWord);
+    const after = element.value.slice(endOfWord);
+    element.value = before + word + after;
+    const cursorPos = before.length + word.length;
+    element.setSelectionRange(cursorPos, cursorPos);
     element.dispatchEvent(new Event('input', { bubbles: true }));
   } else {
     const { container, startOfWord, endOfWord } = pendingReplacement;
