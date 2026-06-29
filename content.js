@@ -363,8 +363,8 @@ function handleInputSpace(el) {
   const khmerWord = lastWord ? fuzzyLookup(lastWord) : null;
   if (!khmerWord) return;
 
-  const endOfWord = pos - 1;           // position of the space
-  const startOfWord = endOfWord - lastWord.length;
+  const endOfWord = pos;                // include the triggering space in the replacement range
+  const startOfWord = endOfWord - lastWord.length - 1;
 
   if (Array.isArray(khmerWord)) {
     const { left, bottom } = getCaretRect(el);
@@ -396,8 +396,8 @@ function handleContentEditableSpace() {
   const khmerWord = lastWord ? fuzzyLookup(lastWord) : null;
   if (!khmerWord) return;
 
-  const startOfWord = range.startOffset - lastWord.length - 1;
-  const endOfWord = range.startOffset - 1;
+  const endOfWord = range.startOffset;  // include the triggering space
+  const startOfWord = endOfWord - lastWord.length - 1;
 
   if (Array.isArray(khmerWord)) {
     const anchorRange = document.createRange();
@@ -412,8 +412,13 @@ function handleContentEditableSpace() {
     replaceRange.setStart(container, startOfWord);
     replaceRange.setEnd(container, endOfWord);
     replaceRange.deleteContents();
-    replaceRange.insertNode(document.createTextNode(khmerWord));
-    selection.collapseToEnd();
+    const newNode = document.createTextNode(khmerWord);
+    replaceRange.insertNode(newNode);
+    const cur = document.createRange();
+    cur.setStartAfter(newNode);
+    cur.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(cur);
   }
 }
 
