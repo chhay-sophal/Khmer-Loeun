@@ -1,6 +1,7 @@
 let khmerMap = {};
 let pendingReplacement = null;
 let popup = null;
+let activeIndex = 0;
 
 fetch(chrome.runtime.getURL('dictionary/index.json'))
   .then(r => r.json())
@@ -68,7 +69,19 @@ function ensurePopupStyles() {
   style.id = 'khmer-loeun-styles';
   style.textContent = `
     #khmer-loeun-popup .kl-item {
-      transition: background 0.15s ease;
+      transition: color 0.15s ease;
+    }
+    #khmer-loeun-popup .kl-highlight {
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      top: 0;
+      background: rgba(0,0,0,0.06);
+      border-radius: 11px;
+      pointer-events: none;
+      z-index: 0;
+      transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1.1),
+                  height  0.2s cubic-bezier(0.2, 0, 0, 1.1);
     }
     @keyframes kl-in {
       from { opacity: 0; transform: translateY(-8px) scale(0.95); filter: blur(4px); }
@@ -130,6 +143,11 @@ function showPopup(options, anchorRect) {
   refraction.className = 'kl-refraction';
   popup.appendChild(refraction);
 
+  // Sliding highlight pill — moves between items via transform
+  const highlight = document.createElement('div');
+  highlight.className = 'kl-highlight';
+  popup.appendChild(highlight);
+
   options.forEach((option, i) => {
     const item = document.createElement('div');
     item.className = 'kl-item';
@@ -175,11 +193,30 @@ function showPopup(options, anchorRect) {
   });
 
   document.body.appendChild(popup);
+  activeIndex = 0;
+  // Position pill instantly on open (no slide animation for initial placement)
+  const pill = popup.querySelector('.kl-highlight');
+  if (pill) pill.style.transition = 'none';
+  setActiveItem(0);
+  requestAnimationFrame(() => {
+    if (pill) pill.style.transition = '';
+  });
 }
 
 function removePopup(clearPending = true) {
   if (popup) { popup.remove(); popup = null; }
-  if (clearPending) pendingReplacement = null;
+  if (clearPending) { pendingReplacement = null; activeIndex = 0; }
+}
+
+function setActiveItem(index) {
+  if (!popup) return;
+  const pill = popup.querySelector('.kl-highlight');
+  const item = popup.querySelectorAll('.kl-item')[index];
+  if (pill && item) {
+    pill.style.transform = `translateY(${item.offsetTop}px)`;
+    pill.style.height    = `${item.offsetHeight}px`;
+  }
+  activeIndex = index;
 }
 
 // ---------------------------------------------------------------------------
@@ -231,7 +268,19 @@ document.addEventListener('keydown', function (e) {
 
   if (e.key === 'Enter') {
     e.preventDefault();
-    commitOption(0);
+    commitOption(activeIndex);
+    return;
+  }
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    setActiveItem((activeIndex + 1) % pendingReplacement.options.length);
+    return;
+  }
+
+  if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    setActiveItem((activeIndex - 1 + pendingReplacement.options.length) % pendingReplacement.options.length);
     return;
   }
 
