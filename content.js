@@ -3,11 +3,14 @@ let pendingReplacement = null;
 let popup = null;
 let activeIndex = 0;
 
-fetch(chrome.runtime.getURL('dictionary/index.json'))
+const browserApi = (typeof browser !== 'undefined' && browser) || (typeof chrome !== 'undefined' && chrome);
+const getURL = (path) => browserApi?.runtime?.getURL(path) || path;
+
+fetch(getURL('dictionary/index.json'))
   .then(r => r.json())
   .then(letters => Promise.all(
     letters.map(l =>
-      fetch(chrome.runtime.getURL(`dictionary/${l}.json`)).then(r => r.json())
+      fetch(getURL(`dictionary/${l}.json`)).then(r => r.json())
     )
   ))
   .then(maps => { khmerMap = Object.assign({}, ...maps); })

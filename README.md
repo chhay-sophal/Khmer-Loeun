@@ -1,10 +1,12 @@
 # ខ្មែរលឿន · Khmer Loeun
 
-A Chrome extension that converts informal Khmer romanization (the way Cambodians type on Facebook, Telegram, etc.) into Khmer Unicode — instantly, as you type.
+A browser extension that converts informal Khmer romanization (the way Cambodians type on Facebook, Telegram, etc.) into Khmer Unicode — instantly, as you type.
 
 Type `chong` + space → `ចង់`  
 Type `heuy` + space → `ហើយ`  
 Type `jg` + space → choose between `ចង់` or `ចឹង`
+
+This repo is now set up for cross-browser WebExtension compatibility, including Chrome, Edge, Firefox, and Safari with proper packaging.
 
 ---
 
