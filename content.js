@@ -43,6 +43,24 @@ function fuzzyLookup(word) {
 }
 
 // ---------------------------------------------------------------------------
+// Page theme detection — samples actual background, ignores OS preference
+// ---------------------------------------------------------------------------
+
+function isPageDark() {
+  for (const el of [document.body, document.documentElement]) {
+    const bg = getComputedStyle(el).backgroundColor;
+    const m  = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);
+    if (!m) continue;
+    const alpha = m[4] !== undefined ? parseFloat(m[4]) : 1;
+    if (alpha < 0.1) continue; // skip transparent — try next element
+    const luminance = 0.299 * +m[1] + 0.587 * +m[2] + 0.114 * +m[3];
+    return luminance < 128;
+  }
+  // No opaque background found — fall back to OS preference
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+// ---------------------------------------------------------------------------
 // Popup UI
 // ---------------------------------------------------------------------------
 
@@ -129,35 +147,33 @@ function ensurePopupStyles() {
       );
     }
 
-    @media (prefers-color-scheme: dark) {
-      #khmer-loeun-popup {
-        background: rgba(40,40,40,0.45);
-        box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3),
-                    inset 0 1.5px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.3);
-      }
-      #khmer-loeun-popup .kl-item {
-        color: #f5f5f7;
-      }
-      #khmer-loeun-popup .kl-item:hover {
-        background: rgba(255,255,255,0.08);
-      }
-      #khmer-loeun-popup .kl-badge {
-        background: rgba(255,255,255,0.12);
-        color: rgba(255,255,255,0.4);
-      }
-      #khmer-loeun-popup .kl-highlight {
-        background: rgba(255,255,255,0.1);
-      }
-      #khmer-loeun-popup .kl-refraction {
-        border-color: rgba(255,255,255,0.12);
-        background: linear-gradient(
-          148deg,
-          rgba(255,255,255,0.08) 0%,
-          rgba(255,255,255,0.02) 38%,
-          rgba(0,0,0,0.04)       70%,
-          rgba(0,0,0,0.08)      100%
-        );
-      }
+    #khmer-loeun-popup.kl-dark {
+      background: rgba(40,40,40,0.45);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3),
+                  inset 0 1.5px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.3);
+    }
+    #khmer-loeun-popup.kl-dark .kl-item {
+      color: #f5f5f7;
+    }
+    #khmer-loeun-popup.kl-dark .kl-item:hover {
+      background: rgba(255,255,255,0.08);
+    }
+    #khmer-loeun-popup.kl-dark .kl-badge {
+      background: rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.4);
+    }
+    #khmer-loeun-popup.kl-dark .kl-highlight {
+      background: rgba(255,255,255,0.1);
+    }
+    #khmer-loeun-popup.kl-dark .kl-refraction {
+      border-color: rgba(255,255,255,0.12);
+      background: linear-gradient(
+        148deg,
+        rgba(255,255,255,0.08) 0%,
+        rgba(255,255,255,0.02) 38%,
+        rgba(0,0,0,0.04)       70%,
+        rgba(0,0,0,0.08)      100%
+      );
     }
   `;
   document.head.appendChild(style);
@@ -169,6 +185,7 @@ function showPopup(options, anchorRect) {
 
   popup = document.createElement('div');
   popup.id = 'khmer-loeun-popup';
+  if (isPageDark()) popup.classList.add('kl-dark');
   Object.assign(popup.style, {
     position: 'fixed',
     zIndex:   '2147483647',
