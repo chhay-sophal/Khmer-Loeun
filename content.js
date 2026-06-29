@@ -155,6 +155,12 @@ document.addEventListener('keydown', function (e) {
     return;
   }
 
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    commitOption(0);
+    return;
+  }
+
   const num = parseInt(e.key, 10);
   if (num >= 1 && num <= pendingReplacement.options.length) {
     e.preventDefault();
