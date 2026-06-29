@@ -68,9 +68,38 @@ function ensurePopupStyles() {
   const style = document.createElement('style');
   style.id = 'khmer-loeun-styles';
   style.textContent = `
-    #khmer-loeun-popup .kl-item {
-      transition: color 0.15s ease;
+    @keyframes kl-in {
+      from { opacity: 0; transform: translateY(-8px) scale(0.95); filter: blur(4px); }
+      to   { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0);   }
     }
+
+    #khmer-loeun-popup {
+      animation: kl-in 0.22s cubic-bezier(0.2, 0, 0, 1.1) both;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(20px) saturate(1.6) brightness(1.04);
+      -webkit-backdrop-filter: blur(20px) saturate(1.6) brightness(1.04);
+      border-radius: 18px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.14), 0 4px 16px rgba(0,0,0,0.08),
+                  inset 0 1.5px 0 rgba(255,255,255,0.85), inset 0 -1px 0 rgba(0,0,0,0.06);
+      padding: 6px;
+      font-size: 17px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    #khmer-loeun-popup .kl-item {
+      color: #1c1c1e;
+      transition: background 0.15s ease;
+    }
+    #khmer-loeun-popup .kl-item:hover {
+      background: rgba(0,0,0,0.06);
+    }
+
+    #khmer-loeun-popup .kl-badge {
+      background: rgba(0,0,0,0.08);
+      color: rgba(0,0,0,0.4);
+    }
+
     #khmer-loeun-popup .kl-highlight {
       position: absolute;
       left: 6px;
@@ -81,15 +110,9 @@ function ensurePopupStyles() {
       pointer-events: none;
       z-index: 0;
       transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1.1),
-                  height  0.2s cubic-bezier(0.2, 0, 0, 1.1);
+                  height   0.2s cubic-bezier(0.2, 0, 0, 1.1);
     }
-    @keyframes kl-in {
-      from { opacity: 0; transform: translateY(-8px) scale(0.95); filter: blur(4px); }
-      to   { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0);   }
-    }
-    #khmer-loeun-popup {
-      animation: kl-in 0.22s cubic-bezier(0.2, 0, 0, 1.1) both;
-    }
+
     #khmer-loeun-popup .kl-refraction {
       position: absolute;
       inset: 0;
@@ -105,6 +128,37 @@ function ensurePopupStyles() {
         rgba(0,0,0,0.07)      100%
       );
     }
+
+    @media (prefers-color-scheme: dark) {
+      #khmer-loeun-popup {
+        background: rgba(40,40,40,0.45);
+        box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3),
+                    inset 0 1.5px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.3);
+      }
+      #khmer-loeun-popup .kl-item {
+        color: #f5f5f7;
+      }
+      #khmer-loeun-popup .kl-item:hover {
+        background: rgba(255,255,255,0.08);
+      }
+      #khmer-loeun-popup .kl-badge {
+        background: rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.4);
+      }
+      #khmer-loeun-popup .kl-highlight {
+        background: rgba(255,255,255,0.1);
+      }
+      #khmer-loeun-popup .kl-refraction {
+        border-color: rgba(255,255,255,0.12);
+        background: linear-gradient(
+          148deg,
+          rgba(255,255,255,0.08) 0%,
+          rgba(255,255,255,0.02) 38%,
+          rgba(0,0,0,0.04)       70%,
+          rgba(0,0,0,0.08)      100%
+        );
+      }
+    }
   `;
   document.head.appendChild(style);
 }
@@ -116,26 +170,11 @@ function showPopup(options, anchorRect) {
   popup = document.createElement('div');
   popup.id = 'khmer-loeun-popup';
   Object.assign(popup.style, {
-    position:             'fixed',
-    zIndex:               '2147483647',
-    // Low-opacity fill — 12% white lets the page show through
-    background:           'rgba(255,255,255,0.12)',
-    backdropFilter:       'blur(15px) saturate(1.6) brightness(1.04)',
-    webkitBackdropFilter: 'blur(15px) saturate(1.6) brightness(1.04)',
-    borderRadius:         '18px',
-    boxShadow:            [
-      '0 16px 48px rgba(0,0,0,0.14)',        // ambient depth
-      '0 4px 16px rgba(0,0,0,0.08)',          // close shadow
-      'inset 0 1.5px 0 rgba(255,255,255,0.85)', // top specular highlight
-      'inset 0 -1px 0 rgba(0,0,0,0.06)',      // bottom thickness shadow
-    ].join(', '),
-    padding:              '6px',
-    fontSize:             '17px',
-    fontFamily:           '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
-    top:                  (anchorRect.bottom + 8) + 'px',
-    left:                 anchorRect.left + 'px',
-    minWidth:             '140px',
-    overflow:             'hidden',
+    position: 'fixed',
+    zIndex:   '2147483647',
+    top:      (anchorRect.bottom + 8) + 'px',
+    left:     anchorRect.left + 'px',
+    minWidth: '140px',
   });
 
   // Decorative refraction layer — gets the displacement filter, text does not
@@ -151,43 +190,19 @@ function showPopup(options, anchorRect) {
   options.forEach((option, i) => {
     const item = document.createElement('div');
     item.className = 'kl-item';
-    Object.assign(item.style, {
-      padding:      '8px 12px',
-      cursor:       'pointer',
-      display:      'flex',
-      alignItems:   'center',
-      gap:          '10px',
-      color:        '#1c1c1e',
-      borderRadius: '11px',
-      position:     'relative',
-      zIndex:       '1',
-    });
+    item.style.cssText = 'padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;border-radius:11px;position:relative;z-index:1';
 
     const badge = document.createElement('span');
+    badge.className = 'kl-badge';
     badge.textContent = i + 1;
-    Object.assign(badge.style, {
-      fontSize:     '11px',
-      background:   'rgba(0,0,0,0.08)',
-      borderRadius: '6px',
-      padding:      '2px 6px',
-      color:        'rgba(0,0,0,0.4)',
-      fontFamily:   '-apple-system, BlinkMacSystemFont, system-ui, monospace',
-      minWidth:     '18px',
-      textAlign:    'center',
-      fontWeight:   '500',
-      flexShrink:   '0',
-    });
+    badge.style.cssText = 'font-size:11px;border-radius:6px;padding:2px 6px;font-family:-apple-system,BlinkMacSystemFont,system-ui,monospace;min-width:18px;text-align:center;font-weight:500;flex-shrink:0';
 
     const label = document.createElement('span');
     label.textContent = option;
-    Object.assign(label.style, {
-      letterSpacing: '0.01em',
-    });
+    label.style.letterSpacing = '0.01em';
 
     item.appendChild(badge);
     item.appendChild(label);
-    item.addEventListener('mouseenter', () => { item.style.background = 'rgba(0,0,0,0.06)'; });
-    item.addEventListener('mouseleave', () => { item.style.background = ''; });
     item.addEventListener('mousedown', (e) => { e.preventDefault(); commitOption(i); });
     popup.appendChild(item);
   });
