@@ -45,56 +45,130 @@ function fuzzyLookup(word) {
 // Popup UI
 // ---------------------------------------------------------------------------
 
+function ensurePopupStyles() {
+  if (document.getElementById('khmer-loeun-styles')) return;
+
+  // SVG displacement filter — applied only to the decorative refraction layer,
+  // so text stays sharp while the border/caustic overlay appears physically bent.
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;pointer-events:none';
+  svg.innerHTML = `<defs>
+    <filter id="kl-refract" x="-30%" y="-30%" width="160%" height="160%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018 0.022"
+                    numOctaves="2" seed="12" result="warp"/>
+      <feDisplacementMap in="SourceGraphic" in2="warp"
+                         scale="7" xChannelSelector="R" yChannelSelector="G"
+                         result="displaced"/>
+      <feComposite in="displaced" in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>`;
+  document.body.appendChild(svg);
+
+  const style = document.createElement('style');
+  style.id = 'khmer-loeun-styles';
+  style.textContent = `
+    #khmer-loeun-popup .kl-item {
+      transition: background 0.15s ease;
+    }
+    @keyframes kl-in {
+      from { opacity: 0; transform: translateY(-8px) scale(0.95); filter: blur(4px); }
+      to   { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0);   }
+    }
+    #khmer-loeun-popup {
+      animation: kl-in 0.22s cubic-bezier(0.2, 0, 0, 1.1) both;
+    }
+    #khmer-loeun-popup .kl-refraction {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      filter: url(#kl-refract);
+      border: 1.5px solid rgba(255,255,255,0.48);
+      background: linear-gradient(
+        148deg,
+        rgba(255,255,255,0.22) 0%,
+        rgba(255,255,255,0.06) 38%,
+        rgba(0,0,0,0.03)       70%,
+        rgba(0,0,0,0.07)      100%
+      );
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 function showPopup(options, anchorRect) {
   removePopup(false);
+  ensurePopupStyles();
 
   popup = document.createElement('div');
   popup.id = 'khmer-loeun-popup';
   Object.assign(popup.style, {
-    position: 'fixed',
-    zIndex: '2147483647',
-    background: '#fff',
-    border: '1px solid #d1d5db',
-    borderRadius: '8px',
-    boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
-    padding: '4px 0',
-    fontSize: '18px',
-    fontFamily: 'sans-serif',
-    top: (anchorRect.bottom + 6) + 'px',
-    left: anchorRect.left + 'px',
-    minWidth: '120px',
+    position:             'fixed',
+    zIndex:               '2147483647',
+    // Low-opacity fill — 12% white lets the page show through
+    background:           'rgba(255,255,255,0.12)',
+    backdropFilter:       'blur(15px) saturate(1.6) brightness(1.04)',
+    webkitBackdropFilter: 'blur(15px) saturate(1.6) brightness(1.04)',
+    borderRadius:         '18px',
+    boxShadow:            [
+      '0 16px 48px rgba(0,0,0,0.14)',        // ambient depth
+      '0 4px 16px rgba(0,0,0,0.08)',          // close shadow
+      'inset 0 1.5px 0 rgba(255,255,255,0.85)', // top specular highlight
+      'inset 0 -1px 0 rgba(0,0,0,0.06)',      // bottom thickness shadow
+    ].join(', '),
+    padding:              '6px',
+    fontSize:             '17px',
+    fontFamily:           '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+    top:                  (anchorRect.bottom + 8) + 'px',
+    left:                 anchorRect.left + 'px',
+    minWidth:             '140px',
+    overflow:             'hidden',
   });
+
+  // Decorative refraction layer — gets the displacement filter, text does not
+  const refraction = document.createElement('div');
+  refraction.className = 'kl-refraction';
+  popup.appendChild(refraction);
 
   options.forEach((option, i) => {
     const item = document.createElement('div');
+    item.className = 'kl-item';
     Object.assign(item.style, {
-      padding: '6px 14px',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '10px',
-      color: '#111',
+      padding:      '8px 12px',
+      cursor:       'pointer',
+      display:      'flex',
+      alignItems:   'center',
+      gap:          '10px',
+      color:        '#1c1c1e',
+      borderRadius: '11px',
+      position:     'relative',
+      zIndex:       '1',
     });
 
     const badge = document.createElement('span');
     badge.textContent = i + 1;
     Object.assign(badge.style, {
-      fontSize: '11px',
-      background: '#e5e7eb',
-      borderRadius: '4px',
-      padding: '1px 5px',
-      color: '#555',
-      fontFamily: 'monospace',
-      minWidth: '16px',
-      textAlign: 'center',
+      fontSize:     '11px',
+      background:   'rgba(0,0,0,0.08)',
+      borderRadius: '6px',
+      padding:      '2px 6px',
+      color:        'rgba(0,0,0,0.4)',
+      fontFamily:   '-apple-system, BlinkMacSystemFont, system-ui, monospace',
+      minWidth:     '18px',
+      textAlign:    'center',
+      fontWeight:   '500',
+      flexShrink:   '0',
     });
 
     const label = document.createElement('span');
     label.textContent = option;
+    Object.assign(label.style, {
+      letterSpacing: '0.01em',
+    });
 
     item.appendChild(badge);
     item.appendChild(label);
-    item.addEventListener('mouseenter', () => { item.style.background = '#f3f4f6'; });
+    item.addEventListener('mouseenter', () => { item.style.background = 'rgba(0,0,0,0.06)'; });
     item.addEventListener('mouseleave', () => { item.style.background = ''; });
     item.addEventListener('mousedown', (e) => { e.preventDefault(); commitOption(i); });
     popup.appendChild(item);
