@@ -6,6 +6,14 @@ let activeIndex = 0;
 const browserApi = (typeof browser !== 'undefined' && browser) || (typeof chrome !== 'undefined' && chrome);
 const getURL = (path) => browserApi?.runtime?.getURL(path) || path;
 
+let extensionEnabled = true;
+browserApi?.storage?.local?.get?.('enabled', (r) => {
+  if (r && r.enabled === false) extensionEnabled = false;
+});
+browserApi?.storage?.onChanged?.addListener?.((changes) => {
+  if ('enabled' in changes) extensionEnabled = changes.enabled.newValue !== false;
+});
+
 fetch(getURL('dictionary/index.json'))
   .then(r => r.json())
   .then(letters => Promise.all(
@@ -466,6 +474,7 @@ function handleContentEditableSpace() {
 // ---------------------------------------------------------------------------
 
 document.addEventListener('keyup', function (e) {
+  if (!extensionEnabled) return;
   if (e.code !== 'Space') return;
 
   const el = e.target;
