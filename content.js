@@ -45,6 +45,9 @@ function fuzzyLookup(word) {
   // strip trailing h after vowel: nah -> na, nih -> ni
   if (/[aeiou]h$/.test(word)) tries.add(word.slice(0, -1));
 
+  // strip apostrophes: k'dam -> kdam, s'ek -> sek
+  if (word.includes("'")) tries.add(word.replace(/'/g, ''));
+
   for (const candidate of tries) {
     if (candidate && candidate !== word && khmerMap[candidate]) {
       return khmerMap[candidate];
@@ -404,7 +407,7 @@ function getCaretRect(el) {
 function handleInputSpace(el) {
   const pos = el.selectionStart;
   const beforeCursor = el.value.substring(0, pos);
-  const match = beforeCursor.match(/([a-zA-Z]+)\s$/);
+  const match = beforeCursor.match(/([a-zA-Z][a-zA-Z']*)\s$/);
   const lastWord = match?.[1]?.toLowerCase();
 
   const khmerWord = lastWord ? fuzzyLookup(lastWord) : null;
@@ -437,7 +440,7 @@ function handleContentEditableSpace() {
 
   const text = container.textContent;
   const beforeCursor = text.substring(0, range.startOffset);
-  const match = beforeCursor.match(/([a-zA-Z]+)\s$/);
+  const match = beforeCursor.match(/([a-zA-Z][a-zA-Z']*)\s$/);
   const lastWord = match?.[1]?.toLowerCase();
 
   const khmerWord = lastWord ? fuzzyLookup(lastWord) : null;

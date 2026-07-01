@@ -33,8 +33,8 @@ function parseLine(line, lineNumber) {
   const romanized = String(parts[0]).toLowerCase().trim();
   const khmerArgs = parts.slice(1);
 
-  if (!romanized || !/^[a-z]+$/.test(romanized)) {
-    console.error(`Error: romanized key must be lowercase a-z letters only. Got: "${romanized}" on line ${lineNumber}`);
+  if (!romanized || !/^[a-z][a-z']*$/.test(romanized)) {
+    console.error(`Error: romanized key must be lowercase a-z letters (apostrophes allowed). Got: "${romanized}" on line ${lineNumber}`);
     process.exit(1);
   }
 
@@ -79,15 +79,15 @@ if (fileFlagIndex !== -1) {
   let index = 0;
   while (index < args.length) {
     const romanized = String(args[index]).toLowerCase().trim();
-    if (!romanized || !/^[a-z]+$/.test(romanized)) {
-      console.error(`Error: romanized key must be lowercase a-z letters only. Got: "${romanized}"`);
+    if (!romanized || !/^[a-z][a-z']*$/.test(romanized)) {
+      console.error(`Error: romanized key must be lowercase a-z letters (apostrophes allowed). Got: "${romanized}"`);
       process.exit(1);
     }
 
     index += 1;
     const khmerArgs = [];
 
-    while (index < args.length && !/^[a-z]+$/.test(args[index])) {
+    while (index < args.length && !/^[a-z][a-z']*$/.test(args[index])) {
       const token = String(args[index]).trim();
       if (token) khmerArgs.push(token);
       index += 1;
