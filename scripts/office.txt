@@ -1,0 +1,98 @@
+# Office vocabulary — 100 common entries
+# Format: romanized khmer
+# Import: node scripts/add.js --file scripts/office.txt
+
+# ── Meetings & Communication ──────────────────────────────────────────────────
+brojum ប្រជុំ
+vejea វេទិកា
+kicprajum កិច្ចប្រជុំ
+sner ស្នើ
+chhnot ឆ្នោត
+domnang តំណាង
+robos របស់
+l'bos របស់
+projum ប្រជុំ
+p'jum ប្រជុំ
+yutnakar យុទ្ធនាការ
+yutnaka យុទ្ធនាការ
+
+# ── Documents & Files ────────────────────────────────────────────────────────
+eksa ឯកសារ
+lekhit លិខិត
+robaykan របាយការណ៍
+komnot កំណត់
+bebot បែបបទ
+kechsonya កិច្ចសន្យា
+sa សារ
+chhbab ច្បាប់
+dombong ដំបូង
+banhchi បញ្ជី
+
+# ── People & Roles ───────────────────────────────────────────────────────────
+chaovay ចៅហ្វាយ
+nayok នាយក
+krobkrong គ្រប់គ្រង
+neyojik និយោជិក
+borihan បរិហារ
+montrey មន្ត្រី
+prer ប្រើ
+prerpras ប្រើប្រាស់
+komnern កំណើន
+
+# ── Finance & Payroll ────────────────────────────────────────────────────────
+prak ប្រាក់
+khae ខែ
+domlai តម្លៃ
+chomnay ចំណាយ
+banhjenh បញ្ចេញ
+luy លុយ
+chomnol ចំណូល
+
+# ── Equipment & Supplies ─────────────────────────────────────────────────────
+krodas ក្រដាស
+kompyutor កុំព្យូទ័រ
+tursap ទូរស័ព្ទ
+printer ម៉ាស៊ីនព្រីន
+scanner ម៉ាស៊ីនស្កែន
+monitor អេក្រង់
+
+# ── Digital & IT ─────────────────────────────────────────────────────────────
+email អ៊ីមែល
+internet អ៊ីនធឺណិត
+wifi វ៉ាយហ្វាយ
+password លេខសម្ងាត់
+system ប្រព័ន្ធ
+software កម្មវិធី
+database មូលដ្ឋានទិន្នន័យ
+backup ទុកបម្រុង
+server ម៉ាស៊ីនមេ
+network បណ្តាញ
+
+# ── Scheduling & Time ────────────────────────────────────────────────────────
+tngai ថ្ងៃ
+pel ពេល
+mong ម៉ោង
+atet អាទិត្យ
+chhnam ឆ្នាំ
+kamnot កំណត់
+velea វេលា
+bontob បន្ទាប់
+p'tob បន្ទាប់ បន្ទប់
+room បន្ទប់
+
+# ── Actions & Verbs ──────────────────────────────────────────────────────────
+banjeak បញ្ជាក់
+yul យល់
+dak ដាក់
+yok យក
+p'jun បញ្ជូន
+banhjun បញ្ជូន
+sday ស្ដាយ
+
+# ── Common Phrases ───────────────────────────────────────────────────────────
+somtos សូមទោស
+akun អរគុណ
+orkun អរគុណ
+trov ត្រូវ
+laor ល្អ
+l'or ល្អ

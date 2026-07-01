@@ -1,11 +1,20 @@
 {
+  "call": "ខល",
+  "camera": "កាមេរ៉ា",
   "cha": "ចា",
   "chab": "ចាប់",
   "chaek": "ចែក",
-  "cham": "ចាំ",
+  "cham": [
+    "ចាំ",
+    "ចាម"
+  ],
   "chanh": "ចាញ់",
+  "chaovay": "ចៅហ្វាយ",
   "chas": "ចាស់",
-  "chat": "ចាត់",
+  "chat": [
+    "ចាត់",
+    "ឆាត"
+  ],
   "chav": "ចៅ",
   "chea": "ជា",
   "cheat": "ជាតិ",
@@ -15,11 +24,14 @@
   "cheu": "ឈឺ",
   "cheung": "ជើង",
   "chey": "ជ័យ",
+  "chhbab": "ច្បាប់",
   "chheu": "ឈឺ",
   "chhnam": "ឆ្នាំ",
+  "chhnang": "ឆ្នាំង",
   "chhneung": "ឆ្នាំង",
   "chhnganj": "ឆ្ងាញ់",
   "chhngay": "ឆ្ងាយ",
+  "chhnot": "ឆ្នោត",
   "chidon": "ជីដូន",
   "chit": "ជិត",
   "chita": "ជីតា",
@@ -37,11 +49,16 @@
   "cholchet": "ចូលចិត្ត",
   "chom": "ចំ",
   "chomkha": "ចំការ",
+  "chomnay": "ចំណាយ",
   "chomnoal": "ចំណូល",
+  "chomnol": "ចំណូល",
   "chong": "ចង់",
   "choub": "ជួប",
   "chouy": "ជួយ",
   "chreun": "ច្រើន",
   "chveng": "ឆ្វេង",
-  "code": "កូដ"
+  "code": "កូដ",
+  "comment": "ខមិន",
+  "computer": "កុំព្យូទ័រ",
+  "cr": "ក្រាស់"
 }
